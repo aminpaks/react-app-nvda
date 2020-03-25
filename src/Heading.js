@@ -1,17 +1,17 @@
 import { cloneElement, Children, useRef, useEffect } from 'react'
 
 export const Heading = ({ children }) => {
-    const child = Children.only(children);
-    const childRef = useRef();
+  const child = Children.only(children);
+  const childRef = useRef();
 
-    useEffect(() => {
-        const timerId = setTimeout(() => {
-            childRef.current.focus()
-        }, 400);
-        return () => {
-            clearTimeout(timerId);
-        };
-    }, [child])
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      childRef.current.focus()
+    }, 200);
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [child])
 
-    return cloneElement(child, { tabIndex: '-1', ref: childRef });
+  return cloneElement(child, { tabIndex: '-1', ref: childRef });
 }

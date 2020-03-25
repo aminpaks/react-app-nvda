@@ -11,11 +11,3 @@
 .Nav a:not(:last-of-type) {
   margin-right: 1em;
 }
-
-.FrameWrapper {
-  margin-top: 2em;
-}
-
-.CurrentApp {
-  margin: 1em 0;
-}

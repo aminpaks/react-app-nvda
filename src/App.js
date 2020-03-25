@@ -1,51 +1,53 @@
 import React, { useState, useCallback } from 'react';
 import './App.css';
-import { Page } from './Page';
 
-const SwitchPage = ({ page }) => {
-  switch (page) {
-    case 'one':
-      return <Page title='Page One' />
-    case 'two':
-      return <Page title='Page Two' />
-    case 'three':
-      return <Page title='Page Three' />
-    default:
-      return <div>Loading...</div>;
-  }
-}
+const __DEV__ = process.env.NODE_ENV !== 'production';
+const { PUBLIC_URL } = process.env;
+
+const useAppState = () => {
+  const [page, setPage] = useState('frame');
+  const loadPage = useCallback((pageToLoad) => {
+    setPage('loading');
+    setTimeout(() => {
+      setPage(pageToLoad);
+    }, 1000);
+  }, []);
+
+
+  return [page, loadPage];
+};
 
 const Link = ({ title, onClick }) => {
   const handleClick = useCallback(event => {
     event.preventDefault();
     onClick();
-  }, [onClick])
-  return <a href={`#link-to-page-${title.toLowerCase()}`} onClick={handleClick}>{title}</a>
-}
+  }, [onClick]);
+  return <a href={`#link-to-page-${title.toLowerCase()}`} onClick={handleClick}>{title}</a>;
+};
 
-const usePageState = () => {
-  const [page, setPage] = useState('one');
-  const loadPage = useCallback((pageToLoad) => {
-    setPage('loading');
-    setTimeout(() => {
-      setPage(pageToLoad);
-    }, 1000)
-  }, []);
-
-
-  return [page, loadPage];
-}
+const getAppUrl = appName => {
+  return (__DEV__ ? PUBLIC_URL : '') + `/${appName}`;
+};
 
 function App() {
-  const [page, loadPage] = usePageState();
+  const [appName, loadApp] = useAppState();
   return (
     <div className="App">
+      <header>
+        <h1 tabIndex="0">NVDA not working well with iframes</h1>
+        <p>Click on apps to dynamically replace the iframe content.</p>
+      </header>
       <nav className="Nav">
-        <Link onClick={() => loadPage('one')} title="One" />
-        <Link onClick={() => loadPage('two')} title="Two" />
-        <Link onClick={() => loadPage('three')} title="Three" />
+        <Link onClick={() => loadApp('frame')} title="App 1" />
+        <Link onClick={() => loadApp('app2')} title="App 2" />
+        <Link onClick={() => loadApp('app3')} title="App 3" />
       </nav>
-      <SwitchPage page={page} />
+      <div className="CurrentApp">Current app: <strong>{appName === 'loading' ? 'unknown' : appName}</strong></div>
+      <div className="FrameWrapper">
+        {appName === '/loading'
+          ? 'Loading application...'
+          : <iframe width="800" height="500" src={getAppUrl(appName)} title="Some title" />}
+      </div>
     </div>
   );
 }
