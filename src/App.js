@@ -3,11 +3,12 @@ import './App.css';
 
 const __DEV__ = process.env.NODE_ENV !== 'production';
 const { PUBLIC_URL } = process.env;
+const LOADING = 'loading';
 
 const useAppState = () => {
   const [page, setPage] = useState('frame');
   const loadPage = useCallback((pageToLoad) => {
-    setPage('loading');
+    setPage(LOADING);
     setTimeout(() => {
       setPage(pageToLoad);
     }, 1000);
@@ -22,11 +23,13 @@ const Link = ({ title, onClick }) => {
     event.preventDefault();
     onClick();
   }, [onClick]);
-  return <a href={`#link-to-page-${title.toLowerCase()}`} onClick={handleClick}>{title}</a>;
+  return <a href={`#link-to-${title.toLowerCase().replace(/[^\w]/, '-')}`} onClick={handleClick}>{title}</a>;
 };
 
 const getAppUrl = appName => {
-  return (__DEV__ ? PUBLIC_URL : '') + `/${appName}`;
+  const url = (__DEV__ ? '' : PUBLIC_URL) + `/?appName=${encodeURIComponent(appName)}`;
+  console.log('url', url);
+  return url;
 };
 
 function App() {
@@ -34,17 +37,16 @@ function App() {
   return (
     <div className="App">
       <header>
-        <h1 tabIndex="0">NVDA not working well with iframes</h1>
-        <p>Click on apps to dynamically replace the iframe content.</p>
+        <h1>NVDA not working well with iframes</h1>
+        <p>Click on apps to load the iframe content with different apps.</p>
       </header>
       <nav className="Nav">
-        <Link onClick={() => loadApp('frame')} title="App 1" />
-        <Link onClick={() => loadApp('app2')} title="App 2" />
-        <Link onClick={() => loadApp('app3')} title="App 3" />
+        <Link onClick={() => loadApp('frame')} title="iFrame App" />
+        <Link onClick={() => loadApp('app2')} title="Dynamic App" />
       </nav>
-      <div className="CurrentApp">Current app: <strong>{appName === 'loading' ? 'unknown' : appName}</strong></div>
+      <div className="CurrentApp">Current app: <strong>{appName === LOADING ? 'unknown' : appName}</strong></div>
       <div className="FrameWrapper">
-        {appName === '/loading'
+        {appName === LOADING
           ? 'Loading application...'
           : <iframe width="800" height="500" src={getAppUrl(appName)} title="Some title" />}
       </div>
